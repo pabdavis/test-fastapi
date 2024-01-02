@@ -59,12 +59,12 @@ async def read_item(item_id: int, q: Union[str, None] = None):
 
 @app.websocket("/ws/{client_id}")
 async def websocket_endpoint(websocket: WebSocket, client_id: int):
-    await connection_manager.connect(websocket)
+    await connection_manager.connect(websocket, client_id)
     try:
         while True:
             data = await websocket.receive_text()
-            await connection_manager.send_message(f"You wrote: {data}", websocket)
+            await connection_manager.send_message(client_id, f"You wrote: {data}")
             print(f"Client #{client_id} sent: {data}")
     except WebSocketDisconnect:
-        connection_manager.disconnect(websocket)
+        connection_manager.disconnect(client_id)
         print(f"Client #{client_id} disconnected")
